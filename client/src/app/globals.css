@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Solarized Light */
+  --bg-primary: #fdf6e3;
+  --bg-secondary: #eee8d5;
+  --text-primary: #586e75;
+  --text-emphasis: #073642;
+  --text-muted: #93a1a1;
+  --color-border: #93a1a1;
+  
+  --solarized-blue: #268bd2;
+  --solarized-cyan: #2aa198;
+  --solarized-green: #859900;
+  --solarized-yellow: #b58900;
+  --solarized-orange: #cb4b16;
+  --solarized-red: #dc322f;
+  --solarized-magenta: #d33682;
+  --solarized-violet: #6c71c4;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Solarized Dark */
+  --bg-primary: #002b36;
+  --bg-secondary: #073642;
+  --text-primary: #839496;
+  --text-emphasis: #eee8d5;
+  --text-muted: #586e75;
+  --color-border: #586e75;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-emphasis: var(--text-emphasis);
+  --color-text-muted: var(--text-muted);
+  --color-border-custom: var(--color-border);
+  
+  --color-solarized-blue: var(--solarized-blue);
+  --color-solarized-cyan: var(--solarized-cyan);
+  --color-solarized-green: var(--solarized-green);
+  --color-solarized-yellow: var(--solarized-yellow);
+  --color-solarized-orange: var(--solarized-orange);
+  --color-solarized-red: var(--solarized-red);
+  --color-solarized-magenta: var(--solarized-magenta);
+  --color-solarized-violet: var(--solarized-violet);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  transition: none; /* User requested no animations */
 }

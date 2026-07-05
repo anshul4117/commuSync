@@ -9,7 +9,37 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
+  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
+  // Initialize theme from localStorage or system setting
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
+
+    setTheme(initialTheme);
+
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  // Toggle theme handler
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  // Fetch tasks on mount
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -31,49 +61,62 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
+      {/* Header section */}
+      <header className="border-b border-border-custom bg-bg-secondary px-6 py-4 flex items-center justify-between">
+        <h1 className="text-xl font-bold text-text-emphasis">
           Mini Task Manager
         </h1>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="px-3 py-1.5 border border-border-custom rounded text-xs font-semibold text-text-emphasis hover:bg-bg-primary focus:outline-none"
+        >
+          {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+        </button>
+      </header>
 
-        {/* Input Form Placeholder */}
+      {/* Main content wrapper */}
+      <main className="max-w-md mx-auto py-10 px-4">
+        {/* Task input form */}
         <div className="flex gap-2 mb-6">
           <input
             type="text"
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder="Enter a task..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-border-custom rounded bg-bg-secondary text-text-emphasis placeholder-text-muted focus:outline-none focus:border-solarized-blue"
           />
           <button
             type="button"
-            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none"
+            className="px-4 py-2 bg-solarized-blue hover:bg-solarized-cyan text-bg-primary font-semibold rounded focus:outline-none"
           >
             Add Task
           </button>
         </div>
 
-        {/* Task List Section */}
+        {/* Tasks display area */}
         {loading ? (
-          <p className="text-center text-gray-500">Loading...</p>
+          <div className="text-center py-4 text-text-muted">Loading...</div>
         ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
+          <div className="text-center py-4 text-solarized-red">{error}</div>
         ) : tasks.length === 0 ? (
-          <p className="text-center text-gray-500">No tasks available.</p>
+          <div className="text-center py-8 text-text-muted border border-dashed border-border-custom rounded-lg bg-bg-secondary">
+            No tasks available.
+          </div>
         ) : (
           <ul className="space-y-3">
             {tasks.map((task) => (
               <li
                 key={task._id}
-                className="flex items-center gap-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50"
+                className="flex items-center gap-3 p-3 bg-bg-secondary border border-border-custom rounded hover:border-text-muted"
               >
-                <span className="text-xl">
+                <span className="text-xl text-solarized-blue select-none">
                   {task.completed ? "☑" : "☐"}
                 </span>
                 <span
-                  className={`text-gray-800 ${
-                    task.completed ? "line-through text-gray-400" : ""
+                  className={`text-text-emphasis ${
+                    task.completed ? "line-through text-text-muted" : ""
                   }`}
                 >
                   {task.title}
@@ -82,7 +125,7 @@ export default function Home() {
             ))}
           </ul>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
