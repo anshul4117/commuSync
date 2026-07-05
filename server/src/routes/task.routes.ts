@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createTask, getTasks } from '../controllers/task.controller';
+import { createTask, getTasks, completeTask } from '../controllers/task.controller';
 
 const router = Router();
 
@@ -8,5 +8,8 @@ router.post('/', createTask);
 
 // Route for getting all tasks
 router.get('/', getTasks);
+
+// Route for completing a task
+router.patch('/:id/complete', completeTask);
 
 export default router;

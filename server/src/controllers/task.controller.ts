@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Task from '../models/task.model';
 
 export const createTask = async (req: Request, res: Response): Promise<void> => {
@@ -51,4 +52,46 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+
+export const completeTask = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Check if the provided id is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid task id'
+      });
+      return;
+    }
+
+    // Find the task
+    const task = await Task.findById(id);
+
+    if (!task) {
+      res.status(404).json({
+        success: false,
+        message: 'Task not found'
+      });
+      return;
+    }
+
+    // Update and save task
+    task.completed = true;
+    await task.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Task marked as completed',
+      data: task
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
 
