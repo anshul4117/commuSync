@@ -34,3 +34,21 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     });
   }
 };
+
+export const getTasks = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: tasks.length,
+      data: tasks
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal Server Error'
+    });
+  }
+};
+
