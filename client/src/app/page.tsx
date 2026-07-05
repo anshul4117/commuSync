@@ -1,23 +1,88 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { getTasks } from "../services/api";
+import { Task } from "../types/task";
+
 export default function Home() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [newTaskTitle, setNewTaskTitle] = useState<string>("");
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        const response = await getTasks();
+        if (response.success && response.data) {
+          setTasks(response.data);
+        } else {
+          setError(response.message || "Failed to load tasks.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to connect to the server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans">
-      <div className="max-w-xl w-full text-center space-y-6">
-        <h1 className="text-4xl font-extrabold tracking-tight">
+    <main className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
           Mini Task Manager
         </h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400">
-          Welcome to the technical assessment boilerplate! The project has been configured with Next.js (App Router), Tailwind CSS, TypeScript, and an Express backend connection.
-        </p>
-        <div className="border border-slate-200 dark:border-slate-800 rounded-lg p-6 bg-white dark:bg-slate-800 shadow-sm text-left">
-          <h2 className="text-xl font-bold mb-4">Initial Setup Complete</h2>
-          <ul className="list-disc list-inside space-y-2 text-slate-600 dark:text-slate-400">
-            <li><span className="font-semibold text-slate-700 dark:text-slate-300">client/</span> - Next.js frontend with Tailwind</li>
-            <li><span className="font-semibold text-slate-700 dark:text-slate-300">server/</span> - Node.js & Express server with TypeScript</li>
-            <li><span className="font-semibold text-slate-700 dark:text-slate-300">MongoDB</span> - Configured connection helper</li>
-          </ul>
+
+        {/* Input Form Placeholder */}
+        <div className="flex gap-2 mb-6">
+          <input
+            type="text"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            placeholder="Enter a task..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="button"
+            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none"
+          >
+            Add Task
+          </button>
         </div>
+
+        {/* Task List Section */}
+        {loading ? (
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : tasks.length === 0 ? (
+          <p className="text-center text-gray-500">No tasks available.</p>
+        ) : (
+          <ul className="space-y-3">
+            {tasks.map((task) => (
+              <li
+                key={task._id}
+                className="flex items-center gap-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50"
+              >
+                <span className="text-xl">
+                  {task.completed ? "☑" : "☐"}
+                </span>
+                <span
+                  className={`text-gray-800 ${
+                    task.completed ? "line-through text-gray-400" : ""
+                  }`}
+                >
+                  {task.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </main>
   );
 }
-
