@@ -1,0 +1,14 @@
+{
+  "name": "commusync-mono",
+  "version": "1.0.0",
+  "description": "Mini Task Manager Assessment root package configuration",
+  "private": true,
+  "scripts": {
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev": "npx concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "build": "npm run build:client && npm run build:server"
+  }
+}
