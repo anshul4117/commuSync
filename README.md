@@ -1,121 +1,268 @@
 # Mini Task Manager
 
-A simple and clean full-stack web application designed for a technical assessment, built with Next.js (App Router), TypeScript, Express, and MongoDB.
+A full-stack task management application featuring a Next.js frontend and an Express backend. This project serves as a technical assessment submission, demonstrating clean code structure, responsive layout design, database integration, and theme state management.
 
 ---
 
-## Project Overview
-A lightweight and beginner-friendly Task Management system configured with a decoupled architecture (separated frontend client and backend server) to manage, track, and execute task lists.
-
 ## Features
-* **Boilerplate Client**: Clean Next.js starter page built with Tailwind CSS.
-* **Modular Backend**: Fully configured Node.js + Express setup in TypeScript.
-* **Database Hook**: Seamless Mongoose connection with server startup safety checks (database connects before Express listens).
-* **Environment Configuration**: Easy-to-replicate environment setups for both client and server.
+
+- Add a task
+- View all tasks
+- Mark a task as completed
+- Delete a task
+- Light/Dark mode
+- Responsive UI
+
+---
 
 ## Tech Stack
-* **Frontend**: Next.js (App Router), TypeScript, Tailwind CSS
-* **Backend**: Node.js, Express, TypeScript
-* **Database**: MongoDB, Mongoose
 
-## Folder Structure
+### Frontend
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+
+### Backend
+- Node.js
+- Express
+- TypeScript
+- MongoDB
+- Mongoose
+
+---
+
+## Project Structure
+
 ```
 CommuSync/
-├── client/                 # Next.js App Router Frontend
+├── client/                 # Frontend Next.js Client
 │   ├── src/
-│   │   └── app/            # Application routes & styles
+│   │   ├── app/            # Next.js App Router Page Layouts
+│   │   ├── services/       # Native Fetch API Services
+│   │   └── types/          # TypeScript Type Interfaces
 │   └── package.json
-├── server/                 # Express + Mongoose Backend
+├── server/                 # Backend Node/Express Server
 │   ├── src/
-│   │   ├── config/         # Configs (e.g. database setup)
-│   │   ├── app.ts          # Express configuration
-│   │   └── server.ts       # Main listener entrypoint
+│   │   ├── config/         # Configuration Modules (e.g. Database)
+│   │   ├── controllers/    # API Controllers
+│   │   ├── models/         # Mongoose Schemas & Models
+│   │   ├── routes/         # Express Router Handlers
+│   │   ├── app.ts          # Express Application Middleware Configuration
+│   │   └── server.ts       # Server Bootstrapper & DB Connection Wrapper
 │   └── package.json
-├── package.json            # Root workspace task runner
-└── README.md               # Main project documentation
+├── package.json            # Root Workspace Package Configuration
+└── README.md               # Main Project Documentation
 ```
 
-## Installation Steps
+---
+
+## Getting Started
 
 ### Prerequisites
-* [Node.js](https://nodejs.org/) (v18.0.0 or higher)
-* [MongoDB](https://www.mongodb.com/) (local instance or Atlas cluster URI)
+- Node.js (v18.0.0 or higher)
+- npm (Node Package Manager)
+- A running MongoDB instance (Local community server or MongoDB Atlas URI)
 
-### Setup Instructions
-
-1. **Clone and Navigate**:
+### Installation
+1. Clone the repository and navigate to the directory:
    ```bash
    cd CommuSync
    ```
-
-2. **Configure Environment Variables**:
-   * Create a `.env` in the `/server` folder using `server/.env.example` as a template:
+2. Configure environment variables for both projects.
+   - For the server, copy the environment template:
      ```bash
      cp server/.env.example server/.env
      ```
-   * Create a `.env` in the `/client` folder using `client/.env.example` as a template:
+     Adjust `PORT` and `MONGODB_URI` inside `server/.env`.
+   - For the client, copy the environment template:
      ```bash
      cp client/.env.example client/.env
      ```
-
-3. **Install Dependencies**:
-   * For the Express server:
+     Adjust `NEXT_PUBLIC_API_URL` inside `client/.env`.
+3. Install dependencies for the root and workspaces:
+   - For the backend server:
      ```bash
      cd server && npm install
      ```
-   * For the Next.js client:
+   - For the frontend client:
      ```bash
      cd ../client && npm install
      ```
 
-4. **Running the Application**:
-   * To run both frontend and backend concurrently from the root directory:
-     ```bash
-     cd .. && npm run dev
-     ```
-   * To run frontend alone:
-     ```bash
-     npm run dev:client
-     ```
-   * To run backend alone:
-     ```bash
-     npm run dev:server
-     ```
+### Running the Backend
+1. Navigate to the server folder:
+   ```bash
+   cd server
+   ```
+2. Start the development server (runs by default on port 5001):
+   ```bash
+   npm run dev
+   ```
+3. To compile TypeScript to production JavaScript:
+   ```bash
+   npm run build
+   ```
+
+### Running the Frontend
+1. Navigate to the client folder:
+   ```bash
+   cd client
+   ```
+2. Start the client dev server:
+   ```bash
+   npm run dev
+   ```
+3. To build the production client package:
+   ```bash
+   npm run build
+   ```
+
+---
 
 ## Environment Variables
 
-### Backend (`server/.env`)
-* `PORT`: Server port (defaults to `5001` to avoid macOS AirPlay conflict on `5000`)
-* `MONGODB_URI`: MongoDB connection string
+### Server
+Create a `.env` file in the `/server` folder with:
+```env
+MONGODB_URI=mongodb://localhost:27017/commusync
+PORT=5001
+```
 
-### Frontend (`client/.env`)
-* `NEXT_PUBLIC_API_URL`: Path to the Express backend endpoints (e.g., `http://localhost:5001/api`)
+### Client
+Create a `.env` file in the `/client` folder with:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5001/api
+```
+
+---
 
 ## API Endpoints
 
-### Health Check
-* **URL**: `/api/health`
-* **Method**: `GET`
-* **Response**:
+### Get All Tasks
+- **URL**: `/api/tasks`
+- **Method**: `GET`
+- **Response Code**: `200 OK`
+- **Response Body**:
   ```json
   {
     "success": true,
-    "message": "Server is running"
+    "count": 1,
+    "data": [
+      {
+        "_id": "603fcd09f1d0440015a995e8",
+        "title": "Build Backend",
+        "completed": false,
+        "createdAt": "2026-07-05T09:32:00.000Z",
+        "updatedAt": "2026-07-05T09:32:00.000Z"
+      }
+    ]
   }
   ```
 
+### Create Task
+- **URL**: `/api/tasks`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "title": "Learn Next.js"
+  }
+  ```
+- **Response Code**: `201 Created`
+- **Response Body**:
+  ```json
+  {
+    "success": true,
+    "message": "Task created successfully",
+    "data": {
+      "_id": "603fcd09f1d0440015a995e9",
+      "title": "Learn Next.js",
+      "completed": false,
+      "createdAt": "2026-07-05T09:33:00.000Z",
+      "updatedAt": "2026-07-05T09:33:00.000Z"
+    }
+  }
+  ```
+
+### Complete Task
+- **URL**: `/api/tasks/:id/complete`
+- **Method**: `PATCH`
+- **Response Code**: `200 OK`
+- **Response Body**:
+  ```json
+  {
+    "success": true,
+    "message": "Task marked as completed",
+    "data": {
+      "_id": "603fcd09f1d0440015a995e9",
+      "title": "Learn Next.js",
+      "completed": true,
+      "createdAt": "2026-07-05T09:33:00.000Z",
+      "updatedAt": "2026-07-05T09:35:00.000Z"
+    }
+  }
+  ```
+
+### Delete Task
+- **URL**: `/api/tasks/:id`
+- **Method**: `DELETE`
+- **Response Code**: `200 OK`
+- **Response Body**:
+  ```json
+  {
+    "success": true,
+    "message": "Task deleted successfully"
+  }
+  ```
+
+---
+
 ## Database Schema
-*(To be implemented in subsequent phases)*
+
+### Task
+Mongoose database schema definitions representing tasks in MongoDB:
+- `title` (String, Required, Trimmed, Max 100 characters)
+- `completed` (Boolean, Default: false)
+- `createdAt` (Date, Auto-generated timestamp)
+- `updatedAt` (Date, Auto-generated timestamp)
+
+---
 
 ## Design Decisions
-* **Decoupled Architecture**: Separating the frontend and backend simplifies development, makes scaling individual layers easier, and models real-world enterprise architectures.
-* **Port Selection**: Changed the default Express port from `5000` to `5001` to prevent issues with the default macOS AirPlay system services.
+
+- **No Authentication**: Omitted to keep the project focused on core full-stack functionalities and assessment scope.
+- **No State Management Library**: Relies entirely on native React state hooks (`useState` and `useEffect`) for simple and predictable state logic without installing Redux or Zustand.
+- **Native Fetch API**: Avoids extra HTTP library overhead (like Axios) in the frontend client. Native Fetch matches modern web APIs.
+- **Simple Folder Structure**: Avoids nested abstractions (like service layers or repository patterns) to make the code accessible and easily readable for junior developers.
+- **Focus on Readability**: Written using clean code practices, clear variable names, and straightforward async/await blocks.
+- **Assessment Scope**: Built strictly to satisfy requirements while ensuring a clean architecture.
+
+---
 
 ## Challenges
-* macOS AirPlay Receiver port collision on port `5000` was resolved by utilizing port `5001` with corresponding environment adjustments.
+
+- **API Integration**: Orchestrating frontend component states to react immediately after backend operations (such as dynamically updating lists after task completions).
+- **Theme Persistence**: Creating a custom Light/Dark theme toggler that resolves system preferences and stores configurations locally inside the browser's `localStorage` without layout shifts or third-party packages.
+- **Loading States**: Displaying indicators to communicate pending request statuses and disabling interactive elements to prevent duplicate form submissions.
+- **Error Handling**: Restricting database validation errors from breaking the user flow, displaying error banners cleanly in the UI, and keeping the existing lists on screen during failures.
+
+---
 
 ## Future Improvements
-*(To be implemented)*
 
-## Screen Recording Link
-*(To be added)*
+- **Edit Task**: Allow users to inline edit task titles.
+- **Search**: Enable searching tasks by title keywords.
+- **Filter Tasks**: Toggle between showing all, active, or completed tasks.
+- **Due Dates**: Attach deadlines to individual tasks.
+- **Categories**: Group tasks under custom tags or categories.
+- **Authentication**: Integrate secure multi-user support (such as Auth0 or NextAuth).
+
+*Note: These features were intentionally left out because they were outside the scope of the assessment requirements.*
+
+---
+
+## Author
+
+- **GitHub**: [Author GitHub Profile]
+- **LinkedIn**: [Author LinkedIn Profile]
