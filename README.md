@@ -264,5 +264,5 @@ Mongoose database schema definitions representing tasks in MongoDB:
 
 ## Author
 
-- **GitHub**: [Author GitHub Profile]
-- **LinkedIn**: [Author LinkedIn Profile]
+- **GitHub**: [anshul4117](https://github.com/anshul4117)
+- **LinkedIn**: [anshul-ab7135245](https://www.linkedin.com/in/anshul-ab7135245/)
