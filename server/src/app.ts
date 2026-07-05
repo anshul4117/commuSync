@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://commusync-tcfr.onrender.com/",
+      "https://commu-sync.vercel.app",
     ],
   })
 );
