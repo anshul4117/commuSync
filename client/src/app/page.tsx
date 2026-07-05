@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getTasks } from "../services/api";
+import { getTasks, createTask } from "../services/api";
 import { Task } from "../types/task";
 
 export default function Home() {
@@ -9,6 +9,8 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
   // Initialize theme from localStorage or system setting
@@ -38,6 +40,40 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
   };
+
+  // Add new task handler
+  const handleAddTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+
+    const trimmedTitle = newTaskTitle.trim();
+    if (!trimmedTitle) {
+      setFormError("Task title is required");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const response = await createTask(trimmedTitle);
+      if (response.success) {
+        setNewTaskTitle("");
+        // Refresh tasks list
+        const fetchResponse = await getTasks();
+        if (fetchResponse.success && fetchResponse.data) {
+          setTasks(fetchResponse.data);
+        } else {
+          setError(fetchResponse.message || "Failed to load updated tasks.");
+        }
+      } else {
+        setFormError(response.message || "Failed to create task.");
+      }
+    } catch (err: any) {
+      setFormError(err.message || "Failed to connect to the server.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   // Fetch tasks on mount
   useEffect(() => {
@@ -78,22 +114,31 @@ export default function Home() {
 
       {/* Main content wrapper */}
       <main className="max-w-md mx-auto py-10 px-4">
+        {/* Form Error Message */}
+        {formError && (
+          <div className="mb-4 text-sm text-solarized-red">
+            {formError}
+          </div>
+        )}
+
         {/* Task input form */}
-        <div className="flex gap-2 mb-6">
+        <form onSubmit={handleAddTask} className="flex gap-2 mb-6">
           <input
             type="text"
             value={newTaskTitle}
+            disabled={submitting}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder="Enter a task..."
-            className="flex-1 px-4 py-2 border border-border-custom rounded bg-bg-secondary text-text-emphasis placeholder-text-muted focus:outline-none focus:border-solarized-blue"
+            className="flex-1 px-4 py-2 border border-border-custom rounded bg-bg-secondary text-text-emphasis placeholder-text-muted focus:outline-none focus:border-solarized-blue disabled:opacity-50"
           />
           <button
-            type="button"
-            className="px-4 py-2 bg-solarized-blue hover:bg-solarized-cyan text-bg-primary font-semibold rounded focus:outline-none"
+            type="submit"
+            disabled={submitting}
+            className="px-4 py-2 bg-solarized-blue hover:bg-solarized-cyan text-bg-primary font-semibold rounded focus:outline-none disabled:opacity-50"
           >
-            Add Task
+            {submitting ? "Adding..." : "Add Task"}
           </button>
-        </div>
+        </form>
 
         {/* Tasks display area */}
         {loading ? (
