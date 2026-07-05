@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getTasks, createTask } from "../services/api";
+import { getTasks, createTask, completeTask, deleteTask } from "../services/api";
 import { Task } from "../types/task";
 
 export default function Home() {
@@ -11,6 +11,9 @@ export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [completingTaskId, setCompletingTaskId] = useState<string | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
   // Initialize theme from localStorage or system setting
@@ -45,6 +48,7 @@ export default function Home() {
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setActionError(null);
 
     const trimmedTitle = newTaskTitle.trim();
     if (!trimmedTitle) {
@@ -73,6 +77,60 @@ export default function Home() {
       setSubmitting(false);
     }
   };
+
+  // Complete task handler
+  const handleCompleteTask = async (id: string, currentlyCompleted: boolean) => {
+    if (currentlyCompleted) return;
+    setActionError(null);
+    setFormError(null);
+
+    try {
+      setCompletingTaskId(id);
+      const response = await completeTask(id);
+      if (response.success) {
+        // Refresh tasks list
+        const fetchResponse = await getTasks();
+        if (fetchResponse.success && fetchResponse.data) {
+          setTasks(fetchResponse.data);
+        } else {
+          setActionError(fetchResponse.message || "Failed to load updated tasks.");
+        }
+      } else {
+        setActionError(response.message || "Failed to complete task.");
+      }
+    } catch (err: any) {
+      setActionError(err.message || "Failed to connect to the server.");
+    } finally {
+      setCompletingTaskId(null);
+    }
+  };
+
+  // Delete task handler
+  const handleDeleteTask = async (id: string) => {
+    setActionError(null);
+    setFormError(null);
+
+    try {
+      setDeletingTaskId(id);
+      const response = await deleteTask(id);
+      if (response.success) {
+        // Refresh tasks list
+        const fetchResponse = await getTasks();
+        if (fetchResponse.success && fetchResponse.data) {
+          setTasks(fetchResponse.data);
+        } else {
+          setActionError(fetchResponse.message || "Failed to load updated tasks.");
+        }
+      } else {
+        setActionError(response.message || "Failed to delete task.");
+      }
+    } catch (err: any) {
+      setActionError(err.message || "Failed to connect to the server.");
+    } finally {
+      setDeletingTaskId(null);
+    }
+  };
+
 
 
   // Fetch tasks on mount
@@ -140,6 +198,13 @@ export default function Home() {
           </button>
         </form>
 
+        {/* Action Error Message */}
+        {actionError && (
+          <div className="mb-4 text-sm text-solarized-red text-center">
+            {actionError}
+          </div>
+        )}
+
         {/* Tasks display area */}
         {loading ? (
           <div className="text-center py-4 text-text-muted">Loading...</div>
@@ -151,23 +216,47 @@ export default function Home() {
           </div>
         ) : (
           <ul className="space-y-3">
-            {tasks.map((task) => (
-              <li
-                key={task._id}
-                className="flex items-center gap-3 p-3 bg-bg-secondary border border-border-custom rounded hover:border-text-muted"
-              >
-                <span className="text-xl text-solarized-blue select-none">
-                  {task.completed ? "☑" : "☐"}
-                </span>
-                <span
-                  className={`text-text-emphasis ${
-                    task.completed ? "line-through text-text-muted" : ""
-                  }`}
+            {tasks.map((task) => {
+              const isCompleting = completingTaskId === task._id;
+              const isDeleting = deletingTaskId === task._id;
+
+              return (
+                <li
+                  key={task._id}
+                  className="flex items-center justify-between gap-3 p-3 bg-bg-secondary border border-border-custom rounded hover:border-text-muted"
                 >
-                  {task.title}
-                </span>
-              </li>
-            ))}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <button
+                      type="button"
+                      disabled={task.completed || isCompleting || isDeleting}
+                      onClick={() => handleCompleteTask(task._id, task.completed)}
+                      className="text-xl text-solarized-blue select-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {task.completed ? "☑" : "☐"}
+                    </button>
+                    {isCompleting && (
+                      <span className="text-xs text-text-muted">Completing...</span>
+                    )}
+                    <span
+                      className={`text-text-emphasis truncate ${
+                        task.completed ? "line-through text-text-muted" : ""
+                      }`}
+                    >
+                      {task.title}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={isDeleting || isCompleting}
+                    onClick={() => handleDeleteTask(task._id)}
+                    className="px-2 py-1 text-xs font-semibold border border-solarized-red text-solarized-red rounded hover:bg-solarized-red hover:text-bg-primary disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </main>
