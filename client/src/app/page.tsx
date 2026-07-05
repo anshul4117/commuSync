@@ -145,35 +145,34 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col">
-      <header className="border-b border-border-custom bg-bg-secondary px-4 py-4 sm:px-6">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-text-emphasis">
+      <header className="border-b border-border-custom bg-bg-secondary px-6 py-6">
+        <div className="max-w-[700px] mx-auto flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-text-emphasis tracking-tight">
             Mini Task Manager
           </h1>
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            className="px-3 py-1.5 border border-border-custom rounded text-xs font-semibold text-text-emphasis hover:bg-bg-primary focus:outline-none focus:ring-2 focus:ring-solarized-blue"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+            className="px-4 py-2 border border-border-custom rounded-md text-sm font-semibold text-text-emphasis hover:bg-bg-primary focus:outline-none focus:ring-2 focus:ring-solarized-blue focus:ring-offset-2 focus:ring-offset-bg-secondary"
           >
-            {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+            {theme === "light" ? "Dark" : "Light"}
           </button>
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-xl mx-auto py-8 px-4 sm:px-6">
-        {/* Error Alert Box */}
+      <main className="flex-1 w-full max-w-[700px] mx-auto py-12 px-6">
         {(error || formError || actionError) && (
           <div
             role="alert"
-            className="mb-6 p-4 border border-solarized-red bg-bg-secondary text-solarized-red rounded text-sm"
+            className="mb-8 p-4 border border-solarized-red bg-bg-secondary text-solarized-red rounded-md text-sm"
           >
             <p className="font-bold mb-1">Error</p>
             <p>{formError || actionError || error}</p>
           </div>
         )}
 
-        <form onSubmit={handleAddTask} className="flex flex-col sm:flex-row gap-2 mb-8">
+        <form onSubmit={handleAddTask} className="flex flex-col sm:flex-row gap-3 mb-10">
           <label htmlFor="task-input" className="sr-only">
             New task title
           </label>
@@ -184,27 +183,27 @@ export default function Home() {
             disabled={submitting}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder="Enter a task..."
-            className="flex-1 px-4 py-2 border border-border-custom rounded bg-bg-secondary text-text-emphasis placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-solarized-blue disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 border border-border-custom rounded-md bg-bg-secondary text-text-emphasis placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-solarized-blue disabled:opacity-50 text-base"
           />
           <button
             type="submit"
             disabled={submitting}
             aria-label="Add new task"
-            className="px-5 py-2 bg-solarized-blue hover:bg-solarized-cyan text-bg-primary font-bold rounded focus:outline-none focus:ring-2 focus:ring-solarized-blue disabled:opacity-50 shrink-0"
+            className="px-6 py-2.5 bg-solarized-blue hover:bg-solarized-blue-hover text-bg-primary font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-solarized-blue disabled:opacity-50 shrink-0 text-base"
           >
             {submitting ? "Adding..." : "Add Task"}
           </button>
         </form>
 
         {loading ? (
-          <div className="text-center py-6 text-text-muted">Loading...</div>
+          <div className="text-center py-8 text-text-muted text-base">Loading...</div>
         ) : tasks.length === 0 ? (
-          <div className="text-center py-12 px-4 text-text-muted border border-dashed border-border-custom rounded bg-bg-secondary">
-            <p className="font-semibold text-text-emphasis mb-1">No tasks available.</p>
+          <div className="text-center py-16 px-6 text-text-muted border border-dashed border-border-custom rounded-md bg-bg-secondary">
+            <p className="font-bold text-text-emphasis mb-2 text-lg">No tasks yet</p>
             <p className="text-sm">Create your first task above.</p>
           </div>
         ) : (
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {tasks.map((task) => {
               const isCompleting = completingTaskId === task._id;
               const isDeleting = deletingTaskId === task._id;
@@ -212,28 +211,28 @@ export default function Home() {
               return (
                 <li
                   key={task._id}
-                  className="flex items-start justify-between gap-4 p-4 bg-bg-secondary border border-border-custom rounded hover:border-text-muted"
+                  className="flex items-start justify-between gap-4 p-4 bg-bg-secondary border border-border-custom rounded-md hover:border-text-muted"
                 >
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="flex items-start gap-4 flex-1 min-w-0">
                     <button
                       type="button"
                       disabled={task.completed || isCompleting || isDeleting}
                       onClick={() => handleCompleteTask(task._id, task.completed)}
-                      aria-label={task.completed ? "Task is completed" : `Mark task as completed`}
-                      className="text-xl text-solarized-blue select-none focus:outline-none focus:ring-2 focus:ring-solarized-blue rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label={task.completed ? "Task completed" : "Mark task as completed"}
+                      className="text-2xl text-solarized-blue select-none focus:outline-none focus:ring-2 focus:ring-solarized-blue rounded disabled:opacity-50 disabled:cursor-not-allowed leading-none"
                     >
                       {task.completed ? "☑" : "☐"}
                     </button>
-                    <div className="flex flex-col flex-1 min-w-0">
+                    <div className="flex flex-col flex-1 min-w-0 pt-0.5">
                       <span
-                        className={`text-text-emphasis break-words whitespace-normal leading-relaxed ${
+                        className={`text-text-emphasis break-words whitespace-normal text-base leading-relaxed ${
                           task.completed ? "line-through text-text-muted" : ""
                         }`}
                       >
                         {task.title}
                       </span>
                       {isCompleting && (
-                        <span className="text-xs text-text-muted mt-0.5">Completing...</span>
+                        <span className="text-xs text-text-muted mt-1">Completing...</span>
                       )}
                     </div>
                   </div>
@@ -242,8 +241,8 @@ export default function Home() {
                     type="button"
                     disabled={isDeleting || isCompleting}
                     onClick={() => handleDeleteTask(task._id)}
-                    aria-label={`Delete task`}
-                    className="px-3 py-1.5 text-xs font-semibold border border-solarized-red text-solarized-red rounded hover:bg-solarized-red hover:text-bg-primary focus:outline-none focus:ring-2 focus:ring-solarized-red disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                    aria-label="Delete task"
+                    className="px-3.5 py-1.5 text-sm font-semibold border border-solarized-red text-solarized-red rounded-md hover:bg-solarized-red hover:text-bg-primary focus:outline-none focus:ring-2 focus:ring-solarized-red disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                   >
                     {isDeleting ? "Deleting..." : "Delete"}
                   </button>
