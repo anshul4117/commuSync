@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://commu-sync.vercel.app",
+      "https://mini-tasks-seven.vercel.app/",
     ],
   })
 );
